@@ -11,5 +11,6 @@ RUN apk --no-cache add ca-certificates
 RUN mkdir /app
 WORKDIR /app
 COPY --from=builder /go/src/github.com/bobcats/shipper/consignment-cli/consignment-cli .
+COPY --from=builder /go/src/github.com/bobcats/shipper/consignment-cli/consignment.json .
 
 CMD ["./consignment-cli"]
