@@ -1,6 +1,8 @@
 package main
 
 import (
+	"errors"
+
 	pb "github.com/bobcats/shipper/user-service/proto/user"
 	micro "github.com/micro/go-micro"
 	"golang.org/x/crypto/bcrypt"
@@ -75,5 +77,16 @@ func (s *service) Create(ctx context.Context, req *pb.User, res *pb.Response) er
 }
 
 func (s *service) ValidateToken(ctx context.Context, req *pb.Token, res *pb.Token) error {
+	claims, err := s.tokenService.Decode(req.Token)
+
+	if err != nil {
+		return err
+	}
+
+	if claims.User.Id == "" {
+		return errors.New("invalid user")
+	}
+
+	res.Valid = true
 	return nil
 }
