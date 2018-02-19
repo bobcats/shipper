@@ -23,7 +23,7 @@ services:
       MICRO_ADDRESS: ":50051"
       MICRO_REGISTRY: "mdns"
       DB_HOST: "datastore:27017"
-  
+
   datastore:
     image: mongo
     ports:
