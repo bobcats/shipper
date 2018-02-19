@@ -2,13 +2,17 @@ package main
 
 import (
 	pb "github.com/bobcats/shipper/user-service/proto/user"
+	micro "github.com/micro/go-micro"
 	"golang.org/x/crypto/bcrypt"
 	"golang.org/x/net/context"
 )
 
+const topic = "user.created"
+
 type service struct {
 	repo         Repository
 	tokenService Authable
+	Publisher    micro.Publisher
 }
 
 func (s *service) Get(ctx context.Context, req *pb.User, res *pb.Response) error {
@@ -62,6 +66,11 @@ func (s *service) Create(ctx context.Context, req *pb.User, res *pb.Response) er
 	}
 
 	res.User = req
+
+	err = s.Publisher.Publish(ctx, req)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 

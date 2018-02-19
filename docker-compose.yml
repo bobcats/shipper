@@ -44,6 +44,14 @@ services:
     environment:
       MICRO_REGISTRY: "mdns"
 
+  email-service:
+    build: ./email-service
+    ports:
+      - 50054:50051
+    environment:
+      MICRO_REGISTRY: "mdns"
+      MICRO_ADDRESS: ":50051"
+
   datastore:
     image: mongo
     ports:
