@@ -9,12 +9,14 @@ import (
 	pb "github.com/bobcats/shipper/consignment-service/proto/consignment"
 	microclient "github.com/micro/go-micro/client"
 	"github.com/micro/go-micro/cmd"
+	"github.com/micro/go-micro/metadata"
 	"golang.org/x/net/context"
 )
 
 const (
-	address         = "localhost:50051"
-	defaultFilename = "consignment.json"
+	address              = "localhost:50051"
+	defaultFilename      = "consignment.json"
+	defaultTokenFilename = "token"
 )
 
 func parseFile(file string) (*pb.Consignment, error) {
@@ -27,6 +29,16 @@ func parseFile(file string) (*pb.Consignment, error) {
 	return consignment, err
 }
 
+func readTokenFile(file string) (string, error) {
+	data, err := ioutil.ReadFile(file)
+
+	if err != nil {
+		return "", err
+	}
+
+	return string(data), err
+}
+
 func main() {
 	cmd.Init()
 	// Set up a connection to the server.
@@ -34,22 +46,35 @@ func main() {
 
 	// Contact the server and print out its response.
 	file := defaultFilename
+	tokenFile := defaultTokenFilename
 	if len(os.Args) > 1 {
 		file = os.Args[1]
 	}
 
-	consignment, err := parseFile(file)
+	if len(os.Args) > 2 {
+		tokenFile = os.Args[2]
+	}
 
+	consignment, err := parseFile(file)
 	if err != nil {
 		log.Fatalf("Could not parse file: %v", err)
 	}
 
-	r, err := client.CreateConsignment(context.Background(), consignment)
+	token, err := readTokenFile(tokenFile)
+	if err != nil {
+		log.Fatalf("Could not read token file: %v", err)
+	}
+
+	ctx := metadata.NewContext(context.Background(), map[string]string{
+		"token": token,
+	})
+
+	r, err := client.CreateConsignment(ctx, consignment)
 	if err != nil {
 		log.Fatalf("Could not greet: %v", err)
 	}
 	log.Printf("Created: %t", r.Created)
-	getAll, err := client.GetConsignments(context.Background(), &pb.GetRequest{})
+	getAll, err := client.GetConsignments(ctx, &pb.GetRequest{})
 	if err != nil {
 		log.Fatalf("Could not list consignments: %v", err)
 	}

@@ -12,5 +12,6 @@ RUN mkdir /app
 WORKDIR /app
 COPY --from=builder /go/src/github.com/bobcats/shipper/consignment-cli/consignment-cli .
 COPY --from=builder /go/src/github.com/bobcats/shipper/consignment-cli/consignment.json .
+COPY --from=builder /go/src/github.com/bobcats/shipper/consignment-cli/token .
 
 CMD ["./consignment-cli"]
