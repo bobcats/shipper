@@ -26,6 +26,8 @@ services:
 
   user-service:
     build: ./user-service
+    depends_on:
+      - database
     ports:
       - 50053:50051
     environment:
