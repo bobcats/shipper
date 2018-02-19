@@ -31,7 +31,7 @@ func (s *service) GetAll(ctx context.Context, req *pb.Request, res *pb.Response)
 }
 
 func (s *service) Auth(ctx context.Context, req *pb.User, res *pb.Token) error {
-	user, err := s.repo.GetByEmailAndPassword(req)
+	_, err := s.repo.GetByEmailAndPassword(req)
 	if err != nil {
 		return err
 	}

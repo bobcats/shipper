@@ -25,7 +25,7 @@ func (repo *UserRepository) GetAll() ([]*pb.User, error) {
 	return users, nil
 }
 
-func (repo *UserRepository) Get(id string) ([]*pb.User, error) {
+func (repo *UserRepository) Get(id string) (*pb.User, error) {
 	var user *pb.User
 	if err := repo.db.First(&user).Error; err != nil {
 		return nil, err
@@ -43,7 +43,9 @@ func (repo *UserRepository) GetByEmailAndPassword(user *pb.User) (*pb.User, erro
 }
 
 func (repo *UserRepository) Create(user *pb.User) error {
-	if err := repo.db.Create(user).Error; err != nil {
+	err := repo.db.Create(user).Error
+	if err != nil {
 		return err
 	}
+	return nil
 }
